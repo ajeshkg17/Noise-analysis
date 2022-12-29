@@ -1,8 +1,9 @@
-site_name: My Docs
+site_name: Ajesh Docs
 
 theme:
   name: material
-
+  features:
+    - navigation.tabs
 nav:
   - index.md
   - measurements.md
