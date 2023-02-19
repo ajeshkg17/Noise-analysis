@@ -131,12 +131,14 @@ if __name__=="__main__":
         for filename in os.listdir(folder):
             endswich_value =f"{fileprefix}_{method}_analysed_reduced.txt"
             if filename.endswith(endswich_value):
-                temperature = int(filename[:filename.find("K_")])
-                temperature_range = np.append(temperature_range,temperature)
+                temperature = filename[:filename.find("K_")]
+                temperature_range = np.append(temperature_range,float(temperature))
+    print(temperature_range)
     temperature_range   = np.sort(temperature_range) 
+    print(temperature_range)
     filelist    = []
     for temperature in temperature_range: 
-        if temperature % 1 ==0 :
+        if float(temperature) % 1 ==0 :
             temperature = int(temperature)
         filename    = str(temperature)+f"{fileprefix}_{method}_analysed_reduced"
         filelist.append(filename)
@@ -148,7 +150,9 @@ if __name__=="__main__":
     frequencies_header  = frequencies_of_interest
     temperature_vs_psd  = np.hstack(([0],frequencies_header))
     for filename in filelist:
-        temperature = int(filename[:filename.find("K_")])
+        temperature = float(filename[:filename.find("K_")])
+        if float(temperature) % 1 ==0 :
+            temperature = int(temperature)
         psd_list = []
         psd_list_bg_substract = []
         print("analysing : ",filename)
