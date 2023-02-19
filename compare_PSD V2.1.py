@@ -62,11 +62,15 @@ sub_folder  = "Analyse"
 # if mac: folder      = "FGT3_S25_#047/Data repeat on 20th night"
 # else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data reapeat on 20th night\Analyse"
 #### Data taken from all 3 measuements are combined in Data_combined folder
-if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS14T/Ajesh_2022/FGT3_S25_#047/Combined"
+#if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS14T/Ajesh_2022/FGT3_S25_#047/Combined"
+#else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
+#fileprefix  = "K_5mS"
+#method          =  "MSA_n2_norm___f_scaled___round3"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+#### Testing old analysed data 19th Feb 2023
+if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS14T/Ajesh_2022/FGT3_S25_#047/Combined_old/"
 else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
-fileprefix  = "K_5mS"
-method          =  "MSA_n2_norm___f_scaled___round3"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
-
+fileprefix  = "K_10mS"
+method          =  "MSA_n2_norm"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 
 #************************************************************* FGT3-S25_D5
@@ -133,9 +137,7 @@ if __name__=="__main__":
             if filename.endswith(endswich_value):
                 temperature = filename[:filename.find("K_")]
                 temperature_range = np.append(temperature_range,float(temperature))
-    print(temperature_range)
     temperature_range   = np.sort(temperature_range) 
-    print(temperature_range)
     filelist    = []
     for temperature in temperature_range: 
         if float(temperature) % 1 ==0 :
