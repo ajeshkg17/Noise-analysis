@@ -62,21 +62,22 @@ sub_folder  = "Analyse"
 # if mac: folder      = "FGT3_S25_#047/Data repeat on 20th night"
 # else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data reapeat on 20th night\Analyse"
 #### Data taken from all 3 measuements are combined in Data_combined folder
-#if mac: folder      = "FGT3_S25_#047/Data_combined"
-#else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
-#fileprefix  = "K_5mS"
+if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS14T/Ajesh_2022/FGT3_S25_#047/Combined"
+else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
+fileprefix  = "K_5mS"
+method          =  "MSA_n2_norm___f_scaled___round3"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 
 
 #************************************************************* FGT3-S25_D5
-if mac: folder      = "/Users/admin-nisem543/Documents/FGT3_S25_#47_9T_Noise/D5_2-Feb_2023_night"
-else  : folder      = r""
-fileprefix  = "K_2,6mS"
-row_sample_rate = 837.1
-method                          = "MSA_n2_norm_1000s-lowpass-Data_Part3_skip_start_600s-trim_time_1000s-f_scaled-round2"#"MSA_n2_norm_lowpass" #,"psd_welch_mean" #
-method          =  "MSA_n2_norm___lowpass___skip_start_600s___f_scaled___round2"
-method          = "MSA_n2_norm___f_scaled___round3"
-method          = "MSA_n2_norm___lowpass___skip_start_600s___f_scaled___round3"
+#if mac: folder      = "/Users/admin-nisem543/Documents/FGT3_S25_#47_9T_Noise/D5_2-Feb_2023_night"
+#else  : folder      = r""
+#fileprefix  = "K_2,6mS"
+#row_sample_rate = 837.1
+#method                          = "MSA_n2_norm_1000s-lowpass-Data_Part3_skip_start_600s-trim_time_1000s-f_scaled-round2"#"MSA_n2_norm_lowpass" #,"psd_welch_mean" #
+#method          =  "MSA_n2_norm___lowpass___skip_start_600s___f_scaled___round2"
+#method          = "MSA_n2_norm___f_scaled___round3"
+#method          = "MSA_n2_norm___lowpass___skip_start_600s___f_scaled___round3"
 
 
 psd_average = False
@@ -131,11 +132,13 @@ if __name__=="__main__":
             endswich_value =f"{fileprefix}_{method}_analysed_reduced.txt"
             if filename.endswith(endswich_value):
                 temperature = int(filename[:filename.find("K_")])
-                temperature_range = np.append(temperature_range,int(temperature))
+                temperature_range = np.append(temperature_range,temperature)
     temperature_range   = np.sort(temperature_range) 
     filelist    = []
     for temperature in temperature_range: 
-        filename    = str(int(temperature))+f"{fileprefix}_{method}_analysed_reduced"
+        if temperature % 1 ==0 :
+            temperature = int(temperature)
+        filename    = str(temperature)+f"{fileprefix}_{method}_analysed_reduced"
         filelist.append(filename)
     analysis_filelocation   = os.path.join(folder  , f"final_results_{fileprefix}_{method}.txt")
     # filelist    = ['10K_10mS_3rd-Order_analysed_reduced']

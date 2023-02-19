@@ -56,13 +56,13 @@ lineterminator = "\n"
 # sample_rate = 104.6
 
 # #FINAL MEASUREMENT ON DEVICE4 FGT3_26052021
-if mac: folder      = "/Users/admin-nisem543/seafile/MAX PLANK/Data/Data/PPMS14T/Ajesh_2022/FGT26052022/Device4_on_16-01-2023_5Prob/Data"
-else folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT26052022\Device4_on_16-01-2023_5Prob\Data"
-filename    ='250K_10mS_K'
-fileprefix  = "K_10mS_K"
+#if mac: folder      = "/Users/admin-nisem543/seafile/MAX PLANK/Data/Data/PPMS14T/Ajesh_2022/FGT26052022/Device4_on_16-01-2023_5Prob/Data"
+#else folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT26052022\Device4_on_16-01-2023_5Prob\Data"
+#filename    ='250K_10mS_K'
+#fileprefix  = "K_10mS_K"
 # # filename    ='205K_10mS'
 # # fileprefix  = "K_10mS"
-sample_rate = 104.6
+#sample_rate = 104.6
 
 ############################################################ FGT3-S25
 # # First measurement on FGT3-S25. done on 20th jan morning
@@ -73,10 +73,11 @@ sample_rate = 104.6
 #if mac: folder      = "FGT3_S25_#047/Data repeat on 20th night"
 #else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data reapeat on 20th night"
 # Data taken from all 3 measuements are combined in Data_combined folder
-#if mac: folder      = "FGT3_S25_#047/Data_combined"
-#else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
-#fileprefix  = "K_5mS"
-#row_sample_rate = 104.6
+if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS14T/Ajesh_2022/FGT3_S25_#047/Combined"
+else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
+fileprefix  = "K_5mS"
+row_sample_rate = 104.6
+method          =  "MSA_n2_norm___f_scaled___round3"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 #************************************************************* FGT3-S25_D5
 #if mac: folder      = "/Users/admin-nisem543/Documents/FGT3_S25_#47_9T_Noise/D5_2-Feb_2023_night"
@@ -374,18 +375,21 @@ if __name__=="__main__":
         filelist = []
         temperature_range = np.array([])
         # Create a list of files 
-        for filename in os.listdir(folder):
+        directory_filelist = os.listdir(folder)
+        for filename in directory_filelist:
             if filename.endswith(fileprefix+'.txt'):
-                temperature = int(filename[:filename.find("K_")])
-                temperature_range = np.append(temperature_range,int(temperature))
+                temperature = float(filename[:filename.find("K_")])
+                temperature_range = np.append(temperature_range,temperature)
     temperature_range   = np.sort(temperature_range) 
     filelist    = []
     for temperature in temperature_range: 
-        filename    = str(int(temperature))+fileprefix
+        if temperature % 1 ==0 :
+            temperature = int(temperature)
+        filename    = str(temperature)+fileprefix
         filelist.append(filename)
     # filelist    = ['310K_10mS_3rd-Order']
     # filelist    = ['2K']
-
+    print(filelist)
 
     #load and analyse all the files
     for filename in filelist:
