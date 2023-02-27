@@ -25,17 +25,20 @@ import os
 from scipy.signal import welch 
 #which system are you using
 if os.path.exists("/Users/admin-nisem543"):
+    print("running in Ajesh's Mac book pro")
     mac         = True
     lab_pc      = False
     kajal_pc    = False
 elif os.path.exists(""):
-    mac         = True
+    print("running in Kajal's PC")
+    mac         = False
     lab_pc      = False
     kajal_pc    = True
 else  : 
+    print("running in Ajesh's PC")
     kajal_pc    = False
-    mac     = False
-    lab_pc  = True
+    mac         = False
+    lab_pc      = True
 delimiter   = ","
 lineterminator = "\n"
 # folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT26052022\Device4\Device4_on-24-12-2022\Data"
@@ -79,9 +82,9 @@ lineterminator = "\n"
 #if mac: folder      = "FGT3_S25_#047/Data repeat on 20th night"
 #else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data reapeat on 20th night"
 # Data taken from all 3 measuements are combined in Data_combined folder
-if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS14T/Ajesh_2022/FGT3_S25_#047/Combined"
+if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/FGT3_S25_#047/D1/Combined"
 if kajal_pc : folder = ""
-else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
+if lab_pc  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
 fileprefix  = "K_5mS"
 row_sample_rate = 104.6
 method          =  "MSA_n2_norm___f_scaled___"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
@@ -249,15 +252,20 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
     
     #### Reding the file into Data array
     filelocation    = os.path.join(folder , filename + ".txt")
-    analysis_filelocation = os.path.join(folder, "Analyse", filename + f"_{method}_analysed.txt")
-    analysis_filelocation2 = os.path.join(folder, "Analyse", filename+ f"_{method}_analysed_reduced.txt")
-    analysis_imagelocation = os.path.join(folder, "Analyse", f"_{method}_analysed_reduced",filename+f"{method}.png")
-    if not os.path.exists(os.path.dirname(analysis_filelocation)):
-        print("making analysis directory: \n", os.path.dirname(analysis_filelocation))
-        os.mkdir(os.path.dirname(analysis_filelocation))
+    analysis_base   = os.path.join(folder,"Analyse")
+    analysis_imagelocation = os.path.join(folder, "Analyse", f"_{method}",filename+f"{method}.png")
+    analysis_filelocation2 = os.path.join(folder, "Analyse", f"_{method}",filename+ f"_{method}_analysed_reduced.txt")
+    analysis_filelocation = os.path.join(folder, "Analyse", f"_{method}","full_data",filename + f"_{method}_analysed.txt")
+    if not os.path.exists(analysis_base):
+        print("making base analysis directory: \n", )
+        os.mkdir(analysis_base)
     if not os.path.exists(os.path.dirname(analysis_imagelocation)):
         print("making analysis directory: \n", os.path.dirname(analysis_imagelocation))
         os.mkdir(os.path.dirname(analysis_imagelocation))
+    if not os.path.exists(os.path.dirname(analysis_filelocation)):
+        print("making analysis directory: \n", os.path.dirname(analysis_filelocation))
+        os.mkdir(os.path.dirname(analysis_filelocation))
+
     with open(filelocation,"r") as f:
         data    = f.read()
         # Split the data into rows
