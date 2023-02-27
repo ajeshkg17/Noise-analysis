@@ -25,9 +25,15 @@ import os
 from scipy.signal import welch 
 #which system are you using
 if os.path.exists("/Users/admin-nisem543"):
-    mac     = True
-    lab_pc  = False
+    mac         = True
+    lab_pc      = False
+    kajal_pc    = False
+elif os.path.exists(""):
+    mac         = True
+    lab_pc      = False
+    kajal_pc    = True
 else  : 
+    kajal_pc    = False
     mac     = False
     lab_pc  = True
 delimiter   = ","
@@ -74,10 +80,11 @@ lineterminator = "\n"
 #else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data reapeat on 20th night"
 # Data taken from all 3 measuements are combined in Data_combined folder
 if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS14T/Ajesh_2022/FGT3_S25_#047/Combined"
+if kajal_pc : folder = ""
 else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
 fileprefix  = "K_5mS"
 row_sample_rate = 104.6
-method          =  "MSA_n2_norm___f_scaled___round3"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+method          =  "MSA_n2_norm___f_scaled___"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 #************************************************************* FGT3-S25_D5
 #if mac: folder      = "/Users/admin-nisem543/Documents/FGT3_S25_#47_9T_Noise/D5_2-Feb_2023_night"
@@ -91,8 +98,8 @@ method          =  "MSA_n2_norm___f_scaled___round3"#"MSA_n2_norm_lowpass"#"MSA_
 #### Basic variables
 # temperature_range = [200]
 tosecond        = 1/104.6/573440
-#skip_few_minuts
 temperature_range = "AutoRange"
+#skip_few_minuts
 skip_tail       = False
 skip_start      = False
 trim_time       = False
