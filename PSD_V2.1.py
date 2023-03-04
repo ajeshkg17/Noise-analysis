@@ -73,21 +73,28 @@ lineterminator = "\n"
 # # fileprefix  = "K_10mS"
 #sample_rate = 104.6
 
-############################################################ FGT3-S25
+############################################################ FGT3-S25 D1
 # # First measurement on FGT3-S25. done on 20th jan morning
 # folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data"
 # #second measurement on FGT3-S25. done on 20th jan morning
 # folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data repeat on 20jan2023"
 # #Third measurement on FGT3-S25. Done on 20th jan night
-#if mac: folder      = "FGT3_S25_#047/Data repeat on 20th night"
-#else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data reapeat on 20th night"
+# if mac: folder      = "FGT3_S25_#047/Data repeat on 20th night"
+# else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data reapeat on 20th night"
 # Data taken from all 3 measuements are combined in Data_combined folder
-if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/FGT3_S25_#047/D1/Combined"
+# if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/FGT3_S25_#047/D1/Combined"
+# if kajal_pc : folder = ""
+# if lab_pc  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
+# fileprefix  = "K_5mS"
+# row_sample_rate = 104.6
+# method          =  "MSA_n2_norm___f_scaled___"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+#### Measured on Oxford System
+if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Oxford Cryostat/FGT3_S25_#47/D1/Data"
 if kajal_pc : folder = ""
-if lab_pc  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
-fileprefix  = "K_5mS"
-row_sample_rate = 104.6
-method          =  "MSA_n2_norm___f_scaled___"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+if lab_pc  : folder      = r""
+fileprefix  = "K"
+row_sample_rate = 837.1
+method          =  "MSA_n2_norm___f_scaled___skip_start_600s___trim_time_3600s___skip_tail_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 #************************************************************* FGT3-S25_D5
 #if mac: folder      = "/Users/admin-nisem543/Documents/FGT3_S25_#47_9T_Noise/D5_2-Feb_2023_night"
@@ -110,9 +117,9 @@ rollingavg      = True
 if "skip_tail" in method : skip_tail        = True
 if "skip_start" in method :skip_start       = True
 if "trim_time" in method :trim_time         = True
-skip_tail_raw   = int( 1000*row_sample_rate)    # Remove few data points from the end
-skip_start_raw  = int( 600*row_sample_rate)     # Remove few data points from the beginning
-trim_length     = int( 1000*row_sample_rate)     # Trimms the date. Keeps from endng till the trim_length towards the start eg:800seconds
+skip_tail_raw   = int( 3600*row_sample_rate)    # Remove few data points from the end
+skip_start_raw  = int( 3600*row_sample_rate)     # Remove few data points from the beginning
+trim_length     = int( 3600*row_sample_rate)     # Trimms the date. Keeps from endng till the trim_length towards the start eg:800seconds
 filelist        = []
 #Check 70K,110K data and edit it 
 # temperature_range   = [300]
@@ -282,15 +289,15 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
     if True: 
         data[:,0]       = (data[:,0])*tosecond
         if skip_tail: #Skipping end
-            print(f"skipping tail of data {data[0]:.0f} to {data[0]:.0f}")
+            print(f"skipping tail of data {data[0,0]:.0f} to {data[0,0]:.0f}")
             data        = data[:-skip_tail_raw,:]
             print("remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
         if skip_start: #Skip begining
-            print(f"skipping start of data {data[0]:.0f}s to {data[0]:.0f}s")
+            print(f"skipping start of data {data[0,0]:.0f}s to {data[0,0]:.0f}s")
             data        = data[skip_start_raw:,:]
             print(f"remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}seconds")
         if trim_time:
-            print(f"trimming        :  data {data[0]:.0f}s to {data[0]:.0f}s")
+            print(f"trimming        :  data {data[0,0]:.0f}s to {data[0,0]:.0f}s")
             data        = data[-trim_length:,:]
             print(f"remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}seconds")
         
@@ -393,7 +400,7 @@ if __name__=="__main__":
         directory_filelist = os.listdir(folder)
         for filename in directory_filelist:
             if filename.endswith(fileprefix+'.txt'):
-                temperature = float(filename[:filename.find("K_")])
+                temperature = float(filename[:filename.find(fileprefix)])
                 temperature_range = np.append(temperature_range,temperature)
     temperature_range   = np.sort(temperature_range) 
     filelist    = []
