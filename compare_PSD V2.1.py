@@ -107,14 +107,19 @@ if lab_pc  : folder      = r""
 fileprefix  = "K_2,6mS"
 #fileprefix  = "K_10,6mS"
 #method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_600s"
-method          =  "psd_welch_mean_1000s___lowpass___f_scaled___skip_start_600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+#method          =  "psd_welch_mean_1000s___lowpass___f_scaled___skip_start_600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 #method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 #method          =  "psd_welch_mean_100s___lowpass___f_scaled___skip_start_1600s"
+#method          =  "psd_welch_median_100s___lowpass___f_scaled___skip_start_1600s"
+method          =  "MSA_n2_norm___f_scaled___skip_start_600s"
 
 
+
+#____________________________________________________________________________________________________________
 psd_average = False
 temperature_range               = "AutoRange" # or [150,200,300]
 sub_folder  = os.path.join("Analyse","_"+method) #This is due to an edit in the PSD program
+base_analysis_folder = os.path.join(folder,"Analyse")
 folder = os.path.join(folder,sub_folder)
 psd_x                           = 2
 psd_y                           = 4
@@ -122,9 +127,8 @@ bg_substraction                 = False
 scale_psd                       = False
 frequencies_of_interest         = np.array([
 
-    0.003,
-    0.006,
-    0.01,
+
+
     0.03,
     0.06,
     0.1,
@@ -226,7 +230,7 @@ if __name__=="__main__":
 
     #### Plotting all the figures
     temperature_vs_psd = temperature_vs_psd.astype(float)
-    first_frequency = np.abs(frequencies_of_interest-0.006).argmin()
+    first_frequency = np.abs(frequencies_of_interest-0.06).argmin()
     last_frequency = np.abs(frequencies_of_interest-3).argmin()
     print(f"ploting {frequencies_of_interest[first_frequency:last_frequency]}")
     fig,(ax1,ax2) = plt.subplots(2,1)
@@ -248,4 +252,5 @@ if __name__=="__main__":
     ax1.set_ylim((ymin,ymax))
     ax2.set_ylim((ymin,ymax))
     plt.savefig(analysis_filelocation[:-4]+".png")
+    plt.savefig(os.path.join(base_analysis_folder,f"final_results_{fileprefix}_{method}.png"))
     plt.show()
