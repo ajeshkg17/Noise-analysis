@@ -41,6 +41,10 @@ else  :
     lab_pc      = True
 delimiter   = ","
 lineterminator = "\n"
+skip_tail_raw   = 0     # Remove few data points from the end
+skip_start_raw  = 0     # Remove few data points from the beginning
+trim_length     = 0     # Trimms the date. Keeps from endng till the trim_length towards the start eg:800seconds
+
 # folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT26052022\Device4\Device4_on-24-12-2022\Data"
 # filename    ='10K_10mS_3rd-Order'
 # fileprefix  = "K_10mS_3rd-Order" 
@@ -65,13 +69,14 @@ lineterminator = "\n"
 # sample_rate = 104.6
 
 # #FINAL MEASUREMENT ON DEVICE4 FGT3_26052021
-#if mac: folder      = "/Users/admin-nisem543/seafile/MAX PLANK/Data/Data/PPMS14T/Ajesh_2022/FGT26052022/Device4_on_16-01-2023_5Prob/Data"
-#else folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT26052022\Device4_on_16-01-2023_5Prob\Data"
-#filename    ='250K_10mS_K'
-#fileprefix  = "K_10mS_K"
+# if mac: folder      = "/Users/admin-nisem543/seafile/MAX PLANK/Data/Data/PPMS14T/Ajesh_2022/FGT26052022/Device4_on_16-01-2023_5Prob/Data"
+# else folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT26052022\Device4_on_16-01-2023_5Prob\Data"
+# filename    ='250K_10mS_K'
+# fileprefix  = "K_10mS_K"
 # # filename    ='205K_10mS'
 # # fileprefix  = "K_10mS"
-#sample_rate = 104.6
+# sample_rate = 104.6
+
 
 ############################################################ FGT3-S25 D1
 # # First measurement on FGT3-S25. done on 20th jan morning
@@ -88,13 +93,24 @@ lineterminator = "\n"
 # fileprefix  = "K_5mS"
 # row_sample_rate = 104.6
 # method          =  "MSA_n2_norm___f_scaled___"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
-#### Measured on Oxford System
-if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Oxford Cryostat/FGT3_S25_#47/D1/Data"
-if kajal_pc : folder = ""
-if lab_pc  : folder      = r""
-fileprefix  = "K"
-row_sample_rate = 837.1
-method          =  "MSA_n2_norm___f_scaled___skip_start_600s___trim_time_3600s___skip_tail_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+
+#____Measured on Oxford System_____
+# measurement 1 Long measurement
+# if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Oxford Cryostat/FGT3_S25_#47/D1/Data"
+# if kajal_pc : folder = ""
+# if lab_pc  : folder      = r""
+# fileprefix  = "K"
+# row_sample_rate = 837.1
+# method          =  "MSA_n2_norm___f_scaled___skip_start_600s___trim_time_3600s___skip_tail_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+
+#** measurement 2 __5hr sequence
+# if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Oxford Cryostat/FGT3_S25_#47/D1/Data_03-03-2023"
+# if kajal_pc : folder = ""
+# if lab_pc  : folder      = r""
+# fileprefix  = "K_2mS"
+# row_sample_rate = 837.1
+# method          =  "MSA_n2_norm___f_scaled___skip_tail_3600s___skip_start_3600s___trim_time_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+# lineterminator = ", \n"
 
 #************************************************************* FGT3-S25_D5
 #if mac: folder      = "/Users/admin-nisem543/Documents/FGT3_S25_#47_9T_Noise/D5_2-Feb_2023_night"
@@ -104,6 +120,13 @@ method          =  "MSA_n2_norm___f_scaled___skip_start_600s___trim_time_3600s__
 #method          =  "MSA_n2_norm___lowpass___f_scaled___round3"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 
+#************************************************************* Carbon resistor
+if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Carbon resistor/Data_05-03-2023"
+if kajal_pc : folder = ""
+if lab_pc  : folder      = r""
+fileprefix  = "K_2,6mS"
+row_sample_rate = 837.1
+method          =  "MSA_n2_norm___f_scaled___skip_start_600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 #### Basic variables
 # temperature_range = [200]
@@ -114,12 +137,27 @@ skip_tail       = False
 skip_start      = False
 trim_time       = False
 rollingavg      = True
-if "skip_tail" in method : skip_tail        = True
-if "skip_start" in method :skip_start       = True
-if "trim_time" in method :trim_time         = True
-skip_tail_raw   = int( 3600*row_sample_rate)    # Remove few data points from the end
-skip_start_raw  = int( 3600*row_sample_rate)     # Remove few data points from the beginning
-trim_length     = int( 3600*row_sample_rate)     # Trimms the date. Keeps from endng till the trim_length towards the start eg:800seconds
+if "skip_tail" in method :
+    skip_tail        = True
+    skip_tail_raw = method[method.find("skip_tail_")+len("skip_tail_"):]
+    skip_tail_raw = float(skip_tail_raw[:skip_tail_raw.find("s")])
+    print(f"will skip tail end of {skip_tail_raw}s")
+    skip_tail_raw = int(skip_tail_raw*row_sample_rate)
+if "skip_start" in method :
+    skip_start       = True
+    skip_tail_start = method[method.find("skip_start_")+len("skip_start_"):]
+    skip_tail_start = float(skip_tail_start[:skip_tail_start.find("s")])
+    print(f"will skip start of {skip_tail_start}s")
+    skip_tail_start = int(skip_tail_start*row_sample_rate)
+if "trim_time" in method :
+    trim_time         = True
+    trim_length = method[method.find("trim_time_")+len("trim_time_"):]
+    trim_length = float(trim_length[:trim_length.find("s")])
+    print(f"will trim_time of {trim_length}s")
+    trim_length = int(trim_length*row_sample_rate)
+#skip_tail_raw   = int( 3600*row_sample_rate)    # Remove few data points from the end
+#skip_start_raw  = int( 600*row_sample_rate)     # Remove few data points from the beginning
+#trim_length     = int( 3600*row_sample_rate)     # Trimms the date. Keeps from endng till the trim_length towards the start eg:800seconds
 filelist        = []
 #Check 70K,110K data and edit it 
 # temperature_range   = [300]
@@ -289,7 +327,7 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
     if True: 
         data[:,0]       = (data[:,0])*tosecond
         if skip_tail: #Skipping end
-            print(f"skipping tail of data {data[0,0]:.0f} to {data[0,0]:.0f}")
+            print(f"skipping tail of data {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
             data        = data[:-skip_tail_raw,:]
             print("remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
         if skip_start: #Skip begining
