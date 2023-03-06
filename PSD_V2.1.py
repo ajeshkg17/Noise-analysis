@@ -131,8 +131,10 @@ fileprefix  = "K_2,6mS"
 #remove_comma = True #data has both comma and space separating columns. we remove all comma. Also the last space.
 #method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_600s"
 #method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
-method          =  "psd_welch_mean_100s___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
-
+#method          =  "psd_welch_mean_100s___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+#method          =  "psd_welch_median_100s___lowpass___f_scaled___skip_start_1600s"
+method          =  "MSA_n2_norm___f_scaled___skip_start_600s"
+method          =  "MSA_n2_norm___f_scaled___skip_start_1000s"
 
 
 
@@ -188,18 +190,18 @@ def fourier_transform_doubleside(signal,sample_rate,method):
 
 def psd_welch(signal,sample_rate,method):
 
-    nperseg_time = method[method.find("psd_welch_mean_")+len("psd_welch_mean_"):]
-    nperseg_time = float(nperseg_time[:nperseg_time.find("s")])
-#    print(f"welch method is running... with segment time of {nperseg_time}s")
-    nperseg1     = int((nperseg_time-1)*sample_rate)
-    f, Pxx_den  = welch(signal, sample_rate, nperseg=nperseg1)
-
     average = method[method.find("psd_welch_")+len("psd_welch_"):]
     average = average[:average.find("_")]
     if average in ["mean","median"]:
+        nperseg_time = method[method.find(f"psd_welch_{average}_")+len(f"psd_welch_{average}_"):] # extract the number + s_
+        nperseg_time = float(nperseg_time[:nperseg_time.find("s")])                               # Remove s_and_the_rest
+        nperseg1     = int((nperseg_time-1)*sample_rate)
         print(f"welch {average} is running... with segment time of {nperseg_time}s")
         f, Pxx_den = welch(signal, sample_rate, nperseg=nperseg1, average=average)
     else:
+        nperseg_time = method[method.find(f"psd_welch_")+len(f"psd_welch_"):]
+        nperseg_time = float(nperseg_time[:nperseg_time.find("s")])
+        nperseg1     = int((nperseg_time-1)*sample_rate)
         print(f"simple welch is running... with segment time of {nperseg_time}s")
         f, Pxx_den  = welch(signal, sample_rate, nperseg=nperseg1)
     # plt.semilogy(f, Pxx_den, label='mean')
@@ -309,7 +311,7 @@ def lowpass(signal,fs,method):
 
 #### Data analysis function
 def analyse_signal(    filename, folder, method, tosecond, lineterminator, delimiter, skip_tail, skip_start, trim_time, skip_tail_raw, skip_start_raw, trim_length, lowpass, psd_welch, fourier_transform_doubleside):
-    print("analysing : ", filename)
+    print("\n analysing : ", filename)
 
     #### Reding the file into Data array
     filelocation    = os.path.join(folder , filename + ".txt")
@@ -398,7 +400,7 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
     #### Calculating the PSD  
     if "MSA_n2_norm" in method:
         psd = fourier_transform_doubleside
-    if "psd_welch_mean" in method:
+    if "psd_welch" in method:
         psd = psd_welch
     # acf = np.correlate(signal, signal, mode='full')[:np.size(signal)]
     # Use the Wiener-Khinchin theorem to convert the ACF to the PSD
