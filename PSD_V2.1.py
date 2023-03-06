@@ -17,6 +17,7 @@ The dataset is located in the "folder" variable,
     Bug fix:V2.1
     If the we apply more than one data removal oparation only the last one is applied as all oparations take raw data to signal data variable
 """
+print("\n______________________Start____________________\n")
 import multiprocessing
 from scipy.signal import decimate, firwin, kaiserord
 import numpy as np
@@ -44,7 +45,7 @@ lineterminator = "\n"
 skip_tail_raw   = 0     # Remove few data points from the end
 skip_start_raw  = 0     # Remove few data points from the beginning
 trim_length     = 0     # Trimms the date. Keeps from endng till the trim_length towards the start eg:800seconds
-
+remove_comma    = False # Some data has comma and space mixed as delimitor
 # folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT26052022\Device4\Device4_on-24-12-2022\Data"
 # filename    ='10K_10mS_3rd-Order'
 # fileprefix  = "K_10mS_3rd-Order" 
@@ -104,13 +105,14 @@ trim_length     = 0     # Trimms the date. Keeps from endng till the trim_length
 # method          =  "MSA_n2_norm___f_scaled___skip_start_600s___trim_time_3600s___skip_tail_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 #** measurement 2 __5hr sequence
-# if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Oxford Cryostat/FGT3_S25_#47/D1/Data_03-03-2023"
-# if kajal_pc : folder = ""
-# if lab_pc  : folder      = r""
-# fileprefix  = "K_2mS"
-# row_sample_rate = 837.1
-# method          =  "MSA_n2_norm___f_scaled___skip_tail_3600s___skip_start_3600s___trim_time_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
-# lineterminator = ", \n"
+if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Oxford Cryostat/FGT3_S25_#47/D1/Data_03-03-2023"
+if kajal_pc : folder = ""
+if lab_pc  : folder      = r""
+fileprefix  = "K_2mS"
+row_sample_rate = 0 #To test the automatic sample rate calculator
+method          =  "MSA_n2_norm___f_scaled___skip_tail_3600s___skip_start_3600s___trim_time_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+method          =  "MSA_n2_norm___f_scaled___skip_start_3600s"
+lineterminator = ", \n"
 
 #************************************************************* FGT3-S25_D5
 #if mac: folder      = "/Users/admin-nisem543/Documents/FGT3_S25_#47_9T_Noise/D5_2-Feb_2023_night"
@@ -121,13 +123,22 @@ trim_length     = 0     # Trimms the date. Keeps from endng till the trim_length
 
 
 #************************************************************* Carbon resistor
-if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Carbon resistor/Data_05-03-2023"
-if kajal_pc : folder = ""
-if lab_pc  : folder      = r""
-fileprefix  = "K_2,6mS"
-row_sample_rate = 837.1
-method          =  "MSA_n2_norm___f_scaled___skip_start_600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+#if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Carbon resistor/Data_05-03-2023"
+#if kajal_pc : folder = ""
+#if lab_pc  : folder      = r""
+#fileprefix  = "K_2,6mS"
+#fileprefix  = "K_10,6mS"
+#remove_comma = True #data has both comma and space separating columns. we remove all comma. Also the last space.
+#row_sample_rate = 837.1
+#method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_600s"
+#method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+#method          =  "psd_welch_mean_100s___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
+
+
+
+
+#___________________________________________________________________________________________________
 #### Basic variables
 # temperature_range = [200]
 tosecond        = 1/104.6/573440
@@ -145,10 +156,10 @@ if "skip_tail" in method :
     skip_tail_raw = int(skip_tail_raw*row_sample_rate)
 if "skip_start" in method :
     skip_start       = True
-    skip_tail_start = method[method.find("skip_start_")+len("skip_start_"):]
-    skip_tail_start = float(skip_tail_start[:skip_tail_start.find("s")])
-    print(f"will skip start of {skip_tail_start}s")
-    skip_tail_start = int(skip_tail_start*row_sample_rate)
+    skip_start_raw = method[method.find("skip_start_")+len("skip_start_"):]
+    skip_start_raw = float(skip_start_raw[:skip_start_raw.find("s")])
+    print(f"will skip start of {skip_start_raw}s")
+    skip_start_raw = int(skip_start_raw*row_sample_rate)
 if "trim_time" in method :
     trim_time         = True
     trim_length = method[method.find("trim_time_")+len("trim_time_"):]
@@ -158,7 +169,6 @@ if "trim_time" in method :
 #skip_tail_raw   = int( 3600*row_sample_rate)    # Remove few data points from the end
 #skip_start_raw  = int( 600*row_sample_rate)     # Remove few data points from the beginning
 #trim_length     = int( 3600*row_sample_rate)     # Trimms the date. Keeps from endng till the trim_length towards the start eg:800seconds
-filelist        = []
 #Check 70K,110K data and edit it 
 # temperature_range   = [300]
 
@@ -181,8 +191,12 @@ def fourier_transform_doubleside(signal,sample_rate,method):
 
 
 def psd_welch(signal,sample_rate,method):
-    print("welch method is running...")
-    nperseg1     = int((1000-1)*sample_rate)
+
+    nperseg_time = method[method.find("psd_welch_mean_")+len("psd_welch_mean_"):]
+    nperseg_time = float(nperseg_time[:nperseg_time.find("s")])
+
+    print(f"welch method is running... with segment time of {nperseg_time}s")
+    nperseg1     = int((nperseg_time-1)*sample_rate)
     f, Pxx_den  = welch(signal, sample_rate, nperseg=nperseg1)
     f_med, Pxx_den_med = welch(signal, sample_rate, nperseg=nperseg1, average='median')
     # plt.semilogy(f, Pxx_den, label='mean')
@@ -294,13 +308,12 @@ def lowpass(signal,fs,method):
 def analyse_signal(    filename, folder, method, tosecond, lineterminator, delimiter, skip_tail, skip_start, trim_time, skip_tail_raw, skip_start_raw, trim_length, lowpass, psd_welch, fourier_transform_doubleside):
     print("analysing : ", filename)
 
-    
     #### Reding the file into Data array
     filelocation    = os.path.join(folder , filename + ".txt")
     analysis_base   = os.path.join(folder,"Analyse")
-    analysis_imagelocation = os.path.join(folder, "Analyse", f"_{method}",filename+f"{method}.png")
-    analysis_filelocation2 = os.path.join(folder, "Analyse", f"_{method}",filename+ f"_{method}_analysed_reduced.txt")
-    analysis_filelocation = os.path.join(folder, "Analyse", f"_{method}","full_data",filename + f"_{method}_analysed.txt")
+    analysis_imagelocation = os.path.join(analysis_base, f"_{method}",filename+f"{method}.png")
+    analysis_filelocation2 = os.path.join(analysis_base, f"_{method}",filename+ f"_{method}_analysed_reduced.txt")
+    analysis_filelocation = os.path.join(analysis_base, f"_{method}","full_data",filename + f"_{method}_analysed.txt")
     if not os.path.exists(analysis_base):
         print("making base analysis directory: \n", )
         os.mkdir(analysis_base)
@@ -318,10 +331,16 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
         rows    = rows[0:-1]
         # Split each row into columns
         # Split each row into columns and convert the values to floats
+        if remove_comma:
+            rows = [row.replace(",","")[:-1] for row in rows]
+            delimiter = " "
         columns = [[float(x) for x in row.split(delimiter)] for row in rows]
         # Convert the columns to a numpy array
         data    = np.array(columns)[:]
-
+        #Calculate the data rate
+        measurement_timeintervel = (data[1,0]-data[0,0])*tosecond
+        row_sample_rate =1/measurement_timeintervel
+        print(f"the row sampling rate is {row_sample_rate}Hz")
     
     #### Skipping few minues
     if True: 
@@ -329,13 +348,13 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
         if skip_tail: #Skipping end
             print(f"skipping tail of data {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
             data        = data[:-skip_tail_raw,:]
-            print("remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
+            print(f"remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
         if skip_start: #Skip begining
-            print(f"skipping start of data {data[0,0]:.0f}s to {data[0,0]:.0f}s")
+            print(f"skipping start of data {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
             data        = data[skip_start_raw:,:]
             print(f"remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}seconds")
         if trim_time:
-            print(f"trimming        :  data {data[0,0]:.0f}s to {data[0,0]:.0f}s")
+            print(f"trimming        :  data {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
             data        = data[-trim_length:,:]
             print(f"remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}seconds")
         
@@ -363,9 +382,9 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
     plot_graph = True
     if plot_graph:
         fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2,2)
-        ax1.plot(time,signal_x,label= "singal_x")
+        ax1.plot(time[::10], signal_x[::10],label= "singal_x")
         ax1.set_title("signal_x")
-        ax2.plot(time,signal_y,label= "singal_y")
+        ax2.plot(time[::10],signal_y[::10],label= "singal_y")
         ax2.set_title("signal_y")
         #plt.savefig(os.path.join(os.path.dirname(analysis_filelocation),f"time_{filename[:-4]}_.png"))
 
@@ -391,11 +410,12 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
     
 
     #### Reduce the number of frequencis in PSD
+    print("rolling average calculating....")
     [reduced_frequency,stddev_list_frequency]   = rolling_average(frequencypsd)
     [reduced_MSA_norm_x,stddev_list_x]  = rolling_average(MSA_norm_x)
     [reduced_MSA_norm_y,stddev_list_y]  = rolling_average(MSA_norm_y)
     [reduced_bg_substracted,stddev_list_bg_substracted] = rolling_average(background_substracted)
-
+    print(".....calculation over")
 
     #### Save the PSD                    
     array   = np.vstack((reduced_frequency,reduced_MSA_norm_x,stddev_list_x,reduced_MSA_norm_y,stddev_list_y,reduced_bg_substracted,stddev_list_bg_substracted))
@@ -404,14 +424,15 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
 
 
     # Plot PSD
+    print("Plotting PSD....")
     if plot_graph: 
         ax3.loglog(reduced_frequency,reduced_MSA_norm_x)
         ax3.loglog(reduced_frequency,reduced_MSA_norm_y)
         ax3.set_title("Temperature is "+str(filename)[:-len(fileprefix)])
         ax3.set_xlabel("Frequency (Hz)")
         ax3.set_ylabel("log PSD")
-        ax4.loglog(frequencypsd,MSA_norm_x)
-        ax4.loglog(frequencypsd,MSA_norm_y)
+        ax4.loglog(frequencypsd[::10],MSA_norm_x[::10])
+        ax4.loglog(frequencypsd[::10],MSA_norm_y[::10])
         ax4.set_title("Temperature is "+str(filename)[:-len(fileprefix)])
         ax4.set_xlabel("Frequency (Hz)")
         ax4.set_ylabel("PSD")
@@ -424,6 +445,7 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
         # plt.xlabel("Frequency (Hz)")
         # plt.ylabel("PSD")
         # plt.show()
+        print(".....Plotting completed")
     return 0
 
 if __name__=="__main__":
