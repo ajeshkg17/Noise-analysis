@@ -105,14 +105,14 @@ remove_comma    = False # Some data has comma and space mixed as delimitor
 # method          =  "MSA_n2_norm___f_scaled___skip_start_600s___trim_time_3600s___skip_tail_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 #** measurement 2 __5hr sequence
-if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Oxford Cryostat/FGT3_S25_#47/D1/Data_03-03-2023"
-if kajal_pc : folder = ""
-if lab_pc  : folder      = r""
-fileprefix  = "K_2mS"
-row_sample_rate = 0 #To test the automatic sample rate calculator
-method          =  "MSA_n2_norm___f_scaled___skip_tail_3600s___skip_start_3600s___trim_time_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
-method          =  "MSA_n2_norm___f_scaled___skip_start_3600s"
-lineterminator = ", \n"
+#if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Oxford Cryostat/FGT3_S25_#47/D1/Data_03-03-2023"
+#if kajal_pc : folder = ""
+#if lab_pc  : folder      = r""
+#fileprefix  = "K_2mS"
+#row_sample_rate = 0 #To test the automatic sample rate calculator
+#method          =  "MSA_n2_norm___f_scaled___skip_tail_3600s___skip_start_3600s___trim_time_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+#method          =  "MSA_n2_norm___f_scaled___skip_start_3600s"
+#lineterminator = ", \n"
 
 #************************************************************* FGT3-S25_D5
 #if mac: folder      = "/Users/admin-nisem543/Documents/FGT3_S25_#47_9T_Noise/D5_2-Feb_2023_night"
@@ -123,16 +123,15 @@ lineterminator = ", \n"
 
 
 #************************************************************* Carbon resistor
-#if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Carbon resistor/Data_05-03-2023"
-#if kajal_pc : folder = ""
-#if lab_pc  : folder      = r""
-#fileprefix  = "K_2,6mS"
+if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Carbon resistor/Data_05-03-2023"
+if kajal_pc : folder = ""
+if lab_pc  : folder      = r""
+fileprefix  = "K_2,6mS"
 #fileprefix  = "K_10,6mS"
 #remove_comma = True #data has both comma and space separating columns. we remove all comma. Also the last space.
-#row_sample_rate = 837.1
 #method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_600s"
 #method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
-#method          =  "psd_welch_mean_100s___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+method          =  "psd_welch_mean_100s___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 
 
@@ -150,22 +149,19 @@ trim_time       = False
 rollingavg      = True
 if "skip_tail" in method :
     skip_tail        = True
-    skip_tail_raw = method[method.find("skip_tail_")+len("skip_tail_"):]
-    skip_tail_raw = float(skip_tail_raw[:skip_tail_raw.find("s")])
-    print(f"will skip tail end of {skip_tail_raw}s")
-    skip_tail_raw = int(skip_tail_raw*row_sample_rate)
+    skip_tail_time = method[method.find("skip_tail_")+len("skip_tail_"):]    #time to skip
+    skip_tail_time = float(skip_tail_time[:skip_tail_raw.find("s")])          #time to skip
+    print(f"will skip tail end of {skip_tail_time}s")
 if "skip_start" in method :
     skip_start       = True
-    skip_start_raw = method[method.find("skip_start_")+len("skip_start_"):]
-    skip_start_raw = float(skip_start_raw[:skip_start_raw.find("s")])
-    print(f"will skip start of {skip_start_raw}s")
-    skip_start_raw = int(skip_start_raw*row_sample_rate)
+    skip_start_time = method[method.find("skip_start_")+len("skip_start_"):] #time to skip
+    skip_start_time = float(skip_start_time[:skip_start_time.find("s")])       #time to skip
+    print(f"will skip start of {skip_start_time}s")
 if "trim_time" in method :
     trim_time         = True
-    trim_length = method[method.find("trim_time_")+len("trim_time_"):]
-    trim_length = float(trim_length[:trim_length.find("s")])
+    trim_length_time = method[method.find("trim_time_")+len("trim_time_"):]      #time to skip
+    trim_length_time = float(trim_length_time[:trim_length_time.find("s")])                #time to skip
     print(f"will trim_time of {trim_length}s")
-    trim_length = int(trim_length*row_sample_rate)
 #skip_tail_raw   = int( 3600*row_sample_rate)    # Remove few data points from the end
 #skip_start_raw  = int( 600*row_sample_rate)     # Remove few data points from the beginning
 #trim_length     = int( 3600*row_sample_rate)     # Trimms the date. Keeps from endng till the trim_length towards the start eg:800seconds
@@ -194,11 +190,18 @@ def psd_welch(signal,sample_rate,method):
 
     nperseg_time = method[method.find("psd_welch_mean_")+len("psd_welch_mean_"):]
     nperseg_time = float(nperseg_time[:nperseg_time.find("s")])
-
-    print(f"welch method is running... with segment time of {nperseg_time}s")
+#    print(f"welch method is running... with segment time of {nperseg_time}s")
     nperseg1     = int((nperseg_time-1)*sample_rate)
     f, Pxx_den  = welch(signal, sample_rate, nperseg=nperseg1)
-    f_med, Pxx_den_med = welch(signal, sample_rate, nperseg=nperseg1, average='median')
+
+    average = method[method.find("psd_welch_")+len("psd_welch_"):]
+    average = average[:average.find("_")]
+    if average in ["mean","median"]:
+        print(f"welch {average} is running... with segment time of {nperseg_time}s")
+        f, Pxx_den = welch(signal, sample_rate, nperseg=nperseg1, average=average)
+    else:
+        print(f"simple welch is running... with segment time of {nperseg_time}s")
+        f, Pxx_den  = welch(signal, sample_rate, nperseg=nperseg1)
     # plt.semilogy(f, Pxx_den, label='mean')
     # plt.semilogy(f_med, Pxx_den_med, label='median')
     # plt.ylim([0.5e-3, 1])
@@ -346,14 +349,17 @@ def analyse_signal(    filename, folder, method, tosecond, lineterminator, delim
     if True: 
         data[:,0]       = (data[:,0])*tosecond
         if skip_tail: #Skipping end
+            skip_tail_raw = int(skip_tail_time*row_sample_rate)                      # number of rows to skip
             print(f"skipping tail of data {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
             data        = data[:-skip_tail_raw,:]
             print(f"remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
         if skip_start: #Skip begining
+            skip_start_raw = int(skip_start_time*row_sample_rate)                    # number of rows to skip
             print(f"skipping start of data {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
             data        = data[skip_start_raw:,:]
             print(f"remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}seconds")
         if trim_time:
+            trim_length = int(trim_length_time*row_sample_rate)                          # number of rows to skip
             print(f"trimming        :  data {data[0,0]:.0f}s to {data[-1,0]:.0f}s")
             data        = data[-trim_length:,:]
             print(f"remaining from {data[0,0]:.0f}s to {data[-1,0]:.0f}seconds")
