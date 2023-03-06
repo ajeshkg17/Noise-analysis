@@ -10,6 +10,8 @@ psd_y                           = 4
 
 @author: Ajesh
 """
+print("\n______________________Start____________________\n")
+
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -17,9 +19,15 @@ import os
 if os.path.exists("/Users/admin-nisem543"):
     mac     = True
     lab_pc  = False
-else  : 
+    kajal_pc= False
+if os.path.exists("C:/Users/admin-nisel120"): 
     mac     = False
     lab_pc  = True
+    kajal_pc= False
+if os.path.exists("C:/Users/kajal")  : 
+    mac     = False
+    lab_pc  = False
+    kajal_pc= True
 sub_folder  = "Analyse"
 # import PyOrigin
 # folder                  = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT26052022\Device4\Device4_on-24-12-2022\Data\Analyse"
@@ -66,12 +74,21 @@ sub_folder  = "Analyse"
 #else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
 #fileprefix  = "K_5mS"
 #method          =  "MSA_n2_norm___f_scaled___round3"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
-#### Testing old analysed data 19th Feb 2023
-if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS14T/Ajesh_2022/FGT3_S25_#047/Combined_old/"
-else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
-fileprefix  = "K_10mS"
-method          =  "MSA_n2_norm"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
+
+#### Testing old analysed data 19th Feb 2023
+#if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/FGT3_S25_#047/D1/Combined"
+#else  : folder      = r"C:\Users\admin-nisel120\ownCloud5\MAX PLANK\Data\Data\PPMS14T\Ajesh_2022\FGT3_S25_#047\Data_combined"
+#fileprefix  = "K_5mS"
+#method          =  "MSA_n2_norm___f_scaled___"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+
+
+#** measurement 2 __5hr sequence
+#if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Oxford Cryostat/FGT3_S25_#47/D1/Data_03-03-2023"
+#if kajal_pc : folder = ""
+#if lab_pc  : folder      = r""
+#fileprefix  = "K_2mS"
+#method          =  "MSA_n2_norm___f_scaled___skip_start_3600s___trim_time_3600s___skip_tail_3600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
 
 #************************************************************* FGT3-S25_D5
 #if mac: folder      = "/Users/admin-nisem543/Documents/FGT3_S25_#47_9T_Noise/D5_2-Feb_2023_night"
@@ -83,16 +100,28 @@ method          =  "MSA_n2_norm"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch
 #method          = "MSA_n2_norm___f_scaled___round3"
 #method          = "MSA_n2_norm___lowpass___skip_start_600s___f_scaled___round3"
 
+#************************************************************* Carbon resistor
+if mac: folder      = "/Users/admin-nisem543/Seafile/MAX PLANK/Data/PPMS/Carbon resistor/Data_05-03-2023"
+if kajal_pc : folder = ""
+if lab_pc  : folder      = r""
+fileprefix  = "K_2,6mS"
+#fileprefix  = "K_10,6mS"
+#method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_600s"
+method          =  "psd_welch_mean_1000s___lowpass___f_scaled___skip_start_600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+#method          =  "MSA_n2_norm___lowpass___f_scaled___skip_start_1600s"#"MSA_n2_norm_lowpass"#"MSA_n2_norm" #"psd_welch_mean"#___skip_start_600s
+#method          =  "psd_welch_mean_100s___lowpass___f_scaled___skip_start_1600s"
+
 
 psd_average = False
 temperature_range               = "AutoRange" # or [150,200,300]
+sub_folder  = os.path.join("Analyse","_"+method) #This is due to an edit in the PSD program
 folder = os.path.join(folder,sub_folder)
 psd_x                           = 2
 psd_y                           = 4
 bg_substraction                 = False
 scale_psd                       = False
 frequencies_of_interest         = np.array([
-    0.001,
+
     0.003,
     0.006,
     0.01,
@@ -104,8 +133,7 @@ frequencies_of_interest         = np.array([
     1,
     3,
     6,
-    10,
-    20
+    10
 ])
 frequencies_of_interest     = frequencies_of_interest[:]
 
@@ -163,15 +191,20 @@ if __name__=="__main__":
         data = np.loadtxt(filepath,skiprows=0, delimiter=",")
         for frequency in frequencies_of_interest:
             psd_values      = search(data,0,frequency,psd_average)
+            psd_values_y    = psd_values[psd_y]
+            psd_values_x    = psd_values[psd_x]
             if bg_substraction:
-                psd_list  = np.append(psd_list,psd_values[psd_x]-psd_values[psd_y])
+                psd_list  = np.append(psd_list,psd_values_x-psd_values_y)
             else:
-                psd_list  = np.append(psd_list,psd_values[psd_x])
+                psd_list  = np.append(psd_list,psd_values_x)
             #Append error 
             # psd_list  = np.append(psd_list,psd_values[std_dev_column_of_interest])
+        #new_raw         = np.hstack(([str(temperature)],psd_list))
         new_raw         = np.hstack(([temperature],psd_list))
+
         temperature_vs_psd  = np.vstack((temperature_vs_psd, new_raw))
     temperature_vs_psd  = temperature_vs_psd[1:,:]
+    temperature_vs_psd  = temperature_vs_psd.astype(str)
 
 
 
@@ -192,10 +225,12 @@ if __name__=="__main__":
 
 
     #### Plotting all the figures
+    temperature_vs_psd = temperature_vs_psd.astype(float)
     first_frequency = np.abs(frequencies_of_interest-0.006).argmin()
-    last_frequency = np.abs(frequencies_of_interest-1).argmin()
+    last_frequency = np.abs(frequencies_of_interest-3).argmin()
+    print(f"ploting {frequencies_of_interest[first_frequency:last_frequency]}")
     fig,(ax1,ax2) = plt.subplots(2,1)
-    x       = temperature_vs_psd[:,0]
+    x         = temperature_vs_psd[:,0]
     xmin,xmax = min(x),max(x)
     for i, frequency in enumerate(frequencies_of_interest[first_frequency:last_frequency]):
         label   = str(frequency)+"Hz"
@@ -203,15 +238,14 @@ if __name__=="__main__":
         ax1.plot(x, y, label=label)
         ax2.semilogy(x, y, label=label)
         plt.legend()
-        ax1.set_xlim((xmin,xmax))
-        ax2.set_xlim((xmin,xmax))
-        xmin_index = np.abs((x-xmin)).argmin()
-        xmax_index = np.abs((x-xmax)).argmin()
         if i ==0:
-            ymin, ymax = min(y[xmin_index:xmax_index]), max(y[xmin_index:xmax_index])
-        if ymin>min(y[xmin_index:xmax_index]): ymin=min(y[xmin_index:xmax_index])
-        if ymax<max(y[xmin_index:xmax_index]): ymax=max(y[xmin_index:xmax_index])
-        ax1.set_ylim((ymin,ymax))
-        ax2.set_ylim((ymin,ymax))
+            ymin, ymax = min(y), max(y)
+        if ymin>min(y[:]): ymin=min(y[:])
+        if ymax<max(y[:]): ymax=max(y[:])
+
+    ax1.set_xlim((xmin,xmax))
+    ax2.set_xlim((xmin,xmax))
+    ax1.set_ylim((ymin,ymax))
+    ax2.set_ylim((ymin,ymax))
     plt.savefig(analysis_filelocation[:-4]+".png")
     plt.show()
